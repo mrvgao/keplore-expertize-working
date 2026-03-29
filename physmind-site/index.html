@@ -74,24 +74,25 @@
     }
     .nav-cta:hover { opacity: 0.85; color: #fff !important; }
 
+    /* ── CANVAS ── */
+    #hero-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0; pointer-events: none;
+    }
+
     /* ── HERO ── */
     .hero {
       min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 120px 48px 80px;
-      text-align: center;
-      position: relative; overflow: hidden;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 56px; align-items: center;
+      padding: 120px 72px 60px;
+      position: relative; z-index: 1;
+      max-width: 1280px; margin: 0 auto;
     }
+    .hero::before { display: none; }
 
-    /* Background glow effect */
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 20%; left: 50%; transform: translateX(-50%);
-      width: 800px; height: 600px;
-      background: radial-gradient(ellipse, rgba(79,127,255,0.08) 0%, rgba(124,92,252,0.04) 40%, transparent 70%);
-      pointer-events: none;
-    }
+    .hero-left { text-align: left; }
 
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -99,7 +100,7 @@
       text-transform: uppercase; color: var(--accent);
       background: rgba(79,127,255,0.08); border: 1px solid rgba(79,127,255,0.2);
       border-radius: 100px; padding: 6px 16px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
     .hero-eyebrow .dot {
       width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
@@ -111,32 +112,117 @@
     }
 
     .hero h1 {
-      font-size: clamp(42px, 6vw, 80px);
-      font-weight: 900;
-      letter-spacing: -3px;
-      line-height: 1.05;
-      margin-bottom: 28px;
-      max-width: 900px;
+      font-size: clamp(36px, 4.5vw, 68px);
+      font-weight: 900; letter-spacing: -3px;
+      line-height: 1.05; margin-bottom: 24px;
     }
     .hero h1 .gradient-text {
       background: linear-gradient(135deg, #4f7fff 0%, #7c5cfc 50%, #0ea5c7 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     .hero-sub {
-      font-size: clamp(16px, 2vw, 20px);
-      color: var(--muted2);
-      max-width: 640px;
-      line-height: 1.7;
-      margin-bottom: 48px;
+      font-size: clamp(15px, 1.4vw, 18px);
+      color: var(--muted2); max-width: 480px;
+      line-height: 1.7; margin-bottom: 36px;
     }
 
     .hero-actions {
-      display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: center;
-      margin-bottom: 80px;
+      display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+      justify-content: flex-start; margin-bottom: 0;
     }
+
+    /* ── TERMINAL ── */
+    .hero-terminal {
+      background: #08090f;
+      border: 1px solid rgba(79,127,255,0.22);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 0 80px rgba(79,127,255,0.1), 0 32px 64px rgba(0,0,0,0.5);
+    }
+    .terminal-header {
+      padding: 11px 16px; background: #0c0d17;
+      border-bottom: 1px solid rgba(79,127,255,0.12);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .terminal-dots { display: flex; gap: 6px; }
+    .t-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .t-dot.r { background: #ff5f57; }
+    .t-dot.y { background: #febc2e; }
+    .t-dot.g { background: #28c840; }
+    .terminal-title {
+      margin-left: 8px; font-size: 11px; color: var(--muted);
+      font-family: 'SF Mono','Fira Code','Consolas',monospace; letter-spacing: 0.3px;
+    }
+    .terminal-body {
+      padding: 20px 22px; min-height: 300px; max-height: 340px;
+      overflow: hidden;
+      font-family: 'SF Mono','Fira Code','Consolas',monospace;
+      font-size: 12.5px; line-height: 1.85;
+    }
+    .t-line { white-space: pre; }
+    .t-line.th  { color: #7c9fff; font-weight: 700; }
+    .t-line.def { color: rgba(160,165,210,0.65); }
+    .t-line.sep { color: rgba(79,127,255,0.35); }
+    .t-line.stp { color: var(--muted2); }
+    .t-line.prg { color: var(--teal); }
+    .t-line.ok  { color: var(--green); }
+    .t-line.fin { color: var(--green); font-weight: 700; font-size: 13.5px; }
+    .t-line.nte { color: var(--muted); }
+    .t-cursor {
+      display: inline-block; width: 7px; height: 13px;
+      background: var(--accent); vertical-align: middle; margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── STATS WRAP ── */
+    .hero-stats-wrap {
+      position: relative; z-index: 1;
+      padding: 0 72px 64px;
+      max-width: 1280px; margin: 0 auto;
+    }
+
+    /* ── DOMAIN STRIP ── */
+    .domain-strip {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      position: relative; z-index: 1;
+    }
+    .domain-card {
+      position: relative; height: 280px; overflow: hidden;
+      cursor: default;
+    }
+    .domain-card-bg {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: brightness(0.35) saturate(0.6);
+      transition: transform 0.8s ease, filter 0.4s ease;
+      display: block;
+    }
+    .domain-card:hover .domain-card-bg {
+      transform: scale(1.06); filter: brightness(0.45) saturate(0.8);
+    }
+    .domain-card-fallback {
+      position: absolute; inset: 0;
+      z-index: 0;
+    }
+    .domain-card-fallback.f1 { background: linear-gradient(135deg, #0d1220 0%, #0a1628 100%); }
+    .domain-card-fallback.f2 { background: linear-gradient(135deg, #0d1520 0%, #091525 100%); }
+    .domain-card-fallback.f3 { background: linear-gradient(135deg, #0d1020 0%, #090f1e 100%); }
+    .domain-card-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(to top, rgba(6,7,13,0.97) 0%, rgba(6,7,13,0.4) 55%, rgba(6,7,13,0.1) 100%);
+    }
+    .domain-card-content {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 28px; z-index: 2;
+    }
+    .domain-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+    }
+    .domain-title { font-size: 17px; font-weight: 800; margin-bottom: 5px; }
+    .domain-desc { font-size: 12px; color: var(--muted2); line-height: 1.5; }
     .btn-primary {
       display: inline-flex; align-items: center; gap: 8px;
       background: var(--accent); color: #fff;
@@ -576,11 +662,20 @@
     .by-keplore span { color: var(--muted2); font-weight: 600; }
 
     /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; padding: 100px 32px 40px; gap: 40px; }
+      .hero-left { text-align: center; }
+      .hero-left .hero-sub { max-width: none; }
+      .hero-left .hero-actions { justify-content: center; }
+      .hero-stats-wrap { padding: 0 32px 48px; }
+      .domain-strip { grid-template-columns: 1fr; }
+      .domain-card { height: 200px; }
+    }
     @media (max-width: 768px) {
       nav { padding: 0 20px; }
       .nav-links { display: none; }
       section { padding: 64px 24px; }
-      .hero { padding: 100px 24px 60px; }
+      .hero { padding: 100px 24px 40px; }
       .paradigm-grid { grid-template-columns: 1fr; }
       .reasons-grid { grid-template-columns: 1fr; }
       .traction-grid { grid-template-columns: 1fr; }
@@ -619,33 +714,49 @@
   </div>
 </nav>
 
+<canvas id="hero-canvas"></canvas>
+
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">
-    <span class="dot"></span>
-    Expert Agents · Industrial AI
+  <!-- LEFT: text -->
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      Expert Agents · Industrial AI
+    </div>
+    <h1>
+      The Industrial<br>
+      <span class="gradient-text">Physics Brain</span>
+    </h1>
+    <p class="hero-sub">
+      PhysMind achieves state-of-the-art performance on industrial AI tasks
+      through expert agents — not bigger models. The new paradigm for
+      manufacturing intelligence is here.
+    </p>
+    <div class="hero-actions">
+      <a href="#benchmark" class="btn-primary">↓ See the Benchmark</a>
+      <a href="#architecture" class="btn-secondary">Open Source Framework →</a>
+    </div>
   </div>
 
-  <h1>
-    The Industrial<br>
-    <span class="gradient-text">Physics Brain</span>
-  </h1>
-
-  <p class="hero-sub">
-    PhysMind achieves state-of-the-art performance on industrial AI tasks
-    through expert agents — not bigger models. The new paradigm for
-    manufacturing intelligence is here.
-  </p>
-
-  <div class="hero-actions">
-    <a href="#benchmark" class="btn-primary">
-      ↓ See the Benchmark
-    </a>
-    <a href="#architecture" class="btn-secondary">
-      View Open Source Framework →
-    </a>
+  <!-- RIGHT: terminal -->
+  <div class="hero-right">
+    <div class="hero-terminal">
+      <div class="terminal-header">
+        <div class="terminal-dots">
+          <span class="t-dot r"></span>
+          <span class="t-dot y"></span>
+          <span class="t-dot g"></span>
+        </div>
+        <span class="terminal-title">physmind-agent  ·  physicalflow-runtime</span>
+      </div>
+      <div class="terminal-body" id="terminal-body"></div>
+    </div>
   </div>
+</div>
 
+<!-- STATS (full-width below hero) -->
+<div class="hero-stats-wrap">
   <div class="stats-bar">
     <div class="stat-item">
       <div class="stat-value"><span>20</span>+</div>
@@ -664,11 +775,43 @@
       <div class="stat-label">Source Framework</div>
     </div>
   </div>
-
-  <p style="font-size:12px; color:var(--muted); margin-top:14px; text-align:center;">
+  <p style="font-size:12px;color:var(--muted);margin-top:14px;text-align:center;">
     * Industrial Agent Benchmark — to be published by May 2026
   </p>
+</div>
 
+<!-- DOMAIN STRIP -->
+<div class="domain-strip">
+  <div class="domain-card">
+    <div class="domain-card-fallback f1"></div>
+    <img class="domain-card-bg" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=75&fit=crop" alt="" loading="lazy" onerror="this.style.display='none'">
+    <div class="domain-card-overlay"></div>
+    <div class="domain-card-content">
+      <div class="domain-tag">Manufacturing Vision</div>
+      <div class="domain-title">Defect Detection</div>
+      <div class="domain-desc">Magnetic, visual & dimensional inspection on production lines</div>
+    </div>
+  </div>
+  <div class="domain-card">
+    <div class="domain-card-fallback f2"></div>
+    <img class="domain-card-bg" src="https://images.unsplash.com/photo-1563770660941-20978e870e26?w=800&q=75&fit=crop" alt="" loading="lazy" onerror="this.style.display='none'">
+    <div class="domain-card-overlay"></div>
+    <div class="domain-card-content">
+      <div class="domain-tag">Robotics Integration</div>
+      <div class="domain-title">Vision & Motion Systems</div>
+      <div class="domain-desc">PLC integration, robot vision calibration, hardware deployment</div>
+    </div>
+  </div>
+  <div class="domain-card">
+    <div class="domain-card-fallback f3"></div>
+    <img class="domain-card-bg" src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=75&fit=crop" alt="" loading="lazy" onerror="this.style.display='none'">
+    <div class="domain-card-overlay"></div>
+    <div class="domain-card-content">
+      <div class="domain-tag">EV R&amp;D</div>
+      <div class="domain-title">Battery & Cell Inspection</div>
+      <div class="domain-desc">AI model deployment for EV battery quality and safety validation</div>
+    </div>
+  </div>
 </div>
 
 <hr class="divider" />
@@ -1357,18 +1500,107 @@
 </footer>
 
 <script>
-  // Scroll reveal
+  // ── CANVAS PARTICLE NETWORK ──
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, pts = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 65; i++) {
+    pts.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      r: Math.random() * 1.4 + 0.4
+    });
+  }
+
+  (function drawCanvas() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(79,127,255,0.45)';
+      ctx.fill();
+      for (let j = i + 1; j < pts.length; j++) {
+        const q = pts[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 140) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = `rgba(79,127,255,${0.1 * (1 - d/140)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(drawCanvas);
+  })();
+
+  // ── TERMINAL TYPEWRITER ──
+  const LINES = [
+    { t: '> PhysMind Agent  ·  PhysicalFlow Runtime', c: 'th' },
+    { t: '> Indexing 847 expert skills...  ready', c: 'def' },
+    { t: '', c: 'def' },
+    { t: '  ── New Task ────────────────────────────', c: 'sep' },
+    { t: '  Domain  : Magnetic Defect Detection', c: 'def' },
+    { t: '  Machine : A7-2  ·  China Manufacturer', c: 'def' },
+    { t: '', c: 'def' },
+    { t: '  [1/4] Invoking skill: threshold-tuning', c: 'stp' },
+    { t: '  [2/4] Running: scripts/tune.py', c: 'stp' },
+    { t: '         91.3%  ──▶  95.6%  ──▶  99.1%', c: 'prg' },
+    { t: '  [3/4] Validation: PASSED  ✓', c: 'ok' },
+    { t: '  [4/4] Deploying config to PLC-14...', c: 'stp' },
+    { t: '', c: 'def' },
+    { t: '  ✓  Complete  ·  4m 12s', c: 'fin' },
+    { t: '     (vs ~3.5 hrs manual baseline)', c: 'nte' },
+  ];
+
+  const DELAYS = [0,700,200,300,350,350,200,600,700,1400,1100,800,500,900,350];
+  const termBody = document.getElementById('terminal-body');
+
+  function runTerminal() {
+    termBody.innerHTML = '';
+    let idx = 0;
+    function next() {
+      if (idx >= LINES.length) { setTimeout(runTerminal, 3500); return; }
+      const { t, c } = LINES[idx];
+      const div = document.createElement('div');
+      div.className = 't-line ' + c;
+      div.textContent = t;
+      if (idx === LINES.length - 1) {
+        const cur = document.createElement('span');
+        cur.className = 't-cursor';
+        div.appendChild(cur);
+      }
+      termBody.appendChild(div);
+      termBody.scrollTop = termBody.scrollHeight;
+      idx++;
+      setTimeout(next, DELAYS[idx] || 300);
+    }
+    setTimeout(next, 500);
+  }
+  runTerminal();
+
+  // ── SCROLL REVEAL ──
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
 
-  // Stagger reveal children
   document.querySelectorAll('.paradigm-grid, .reasons-grid, .traction-grid, .thesis-grid, .team-grid, .traction-metrics-row').forEach(grid => {
     grid.querySelectorAll(':scope > *').forEach((child, i) => {
       child.style.transitionDelay = `${i * 80}ms`;
