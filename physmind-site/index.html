@@ -84,7 +84,7 @@
     /* ── HERO ── */
     .hero {
       min-height: 100vh;
-      display: grid; grid-template-columns: 1fr 1fr;
+      display: grid; grid-template-columns: 0.85fr 1.15fr;
       gap: 56px; align-items: center;
       padding: 120px 72px 60px;
       position: relative; z-index: 1;
@@ -155,7 +155,7 @@
       font-family: 'SF Mono','Fira Code','Consolas',monospace; letter-spacing: 0.3px;
     }
     .terminal-body {
-      padding: 20px 22px; min-height: 340px; max-height: 380px;
+      padding: 20px 22px; min-height: 380px; max-height: 480px;
       overflow: hidden;
       font-family: 'SF Mono','Fira Code','Consolas',monospace;
       font-size: 12.5px; line-height: 1.85;
@@ -179,6 +179,26 @@
       animation: blink 1s step-end infinite;
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── TERMINAL ANIMATED BARS ── */
+    .t-bar-row { display: flex; align-items: center; gap: 0; white-space: nowrap; color: rgba(14,165,199,0.85); }
+    .t-bar-lbl { min-width: 150px; flex-shrink: 0; }
+    .t-bar-track {
+      display: inline-block; width: 80px; height: 6px;
+      background: rgba(255,255,255,0.07); border-radius: 3px;
+      vertical-align: middle; overflow: hidden; flex-shrink: 0;
+    }
+    .t-bar-fill {
+      height: 100%; border-radius: 3px; width: 0;
+      transition: width 1.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .t-bar-fill.ok   { background: linear-gradient(90deg, #10b981 0%, #34d399 100%); }
+    .t-bar-fill.hot  { background: linear-gradient(90deg, #f97316 0%, #fb923c 100%); }
+    .t-bar-fill.joint { background: linear-gradient(90deg, #4f7fff 0%, #7c5cfc 100%); }
+    .t-bar-fill.flow  { background: linear-gradient(90deg, #0ea5c7 0%, #4f7fff 100%); }
+    .t-bar-stat { color: rgba(160,165,210,0.7); margin-left: 10px; }
+    .t-bar-stat.warn-lbl { color: #f97316; font-weight: 700; }
+    .t-count-val { color: var(--green); font-weight: 800; font-style: normal; }
 
     /* ── STATS WRAP ── */
     .hero-stats-wrap {
@@ -1553,63 +1573,122 @@
     requestAnimationFrame(drawCanvas);
   })();
 
-  // ── TERMINAL TYPEWRITER  (2 cases, alternating) ──
+  // ── TERMINAL TYPEWRITER  (3 cases, alternating) ──
+  // Line types:
+  //   { t, c }         — plain text line, class c
+  //   { h, anim }      — HTML line; anim = 'bar' | 'counter' triggers post-render animation
+  function barRow(lbl, pct, type, stat, warn) {
+    const statCls = warn ? 'warn-lbl' : '';
+    return `<span class="t-bar-lbl">${lbl}</span><span class="t-bar-track"><span class="t-bar-fill ${type}" data-w="${pct}"></span></span><span class="t-bar-stat ${statCls}">${stat}</span>`;
+  }
+  function counterRow(prefix, from, to, suffix) {
+    return `<span style="color:rgba(160,165,210,0.7)">${prefix}</span><span class="t-count-val" data-from="${from}" data-to="${to}">${from}</span><span style="color:rgba(160,165,210,0.7)">${suffix}</span>`;
+  }
+
   const CASES = [
     {
       lines: [
         { t: '> PhysMind Agent  ·  PhysicalFlow Runtime', c: 'th' },
         { t: '> 847 expert skills indexed  ·  ready', c: 'def' },
         { t: '', c: 'def' },
-        { t: '  CASE 1 / 2  ·  GEELY AUTOMOTIVE R&D', c: 'case' },
-        { t: '  ── EV Battery Cell Inspection ──────────', c: 'sep' },
-        { t: '  Task   : Cell stack thermal analysis', c: 'def' },
+        { t: '  CASE 1 / 3  ·  GEELY AUTOMOTIVE R&D', c: 'case' },
+        { t: '  ── EV Battery Pack Thermal Analysis ────', c: 'sep' },
+        { t: '  Task   : Cell temperature anomaly scan', c: 'def' },
         { t: '  System : 96-cell NMC pack  ·  Line 3', c: 'def' },
         { t: '', c: 'def' },
-        { t: '  [Physics]  ∂T/∂t = α∇²T + Q/ρcₚ', c: 'phys' },
-        { t: '  Cell 01:  23.1°C  ████████░░  nominal', c: 'bar' },
-        { t: '  Cell 07:  31.4°C  ██████████  ⚠ hot', c: 'warn' },
-        { t: '  Cell 12:  22.8°C  ████████░░  nominal', c: 'bar' },
-        { t: '  Cell 19:  33.7°C  ███████████ ⚠ hot', c: 'warn' },
+        { t: '  [Thermodynamics]  ∂T/∂t = α∇²T + Q/ρcₚ', c: 'phys' },
+        { h: barRow('  Cell 01:  23.1°C  ', 76, 'ok',   '  nominal'), anim: 'bar' },
+        { h: barRow('  Cell 07:  31.4°C  ', 95, 'hot',  '  ⚠ overheat', true), anim: 'bar' },
+        { h: barRow('  Cell 12:  22.8°C  ', 73, 'ok',   '  nominal'), anim: 'bar' },
+        { h: barRow('  Cell 19:  33.7°C  ', 98, 'hot',  '  ⚠ critical', true), anim: 'bar' },
         { t: '', c: 'def' },
-        { t: '  [1/3] Anomaly: 2 cells flagged', c: 'stp' },
+        { t: '  [1/3] Anomaly detected: 2 cells flagged', c: 'stp' },
         { t: '  [2/3] Vision calibration: DONE  ✓', c: 'ok' },
         { t: '  [3/3] Report → Geely R&D: SENT  ✓', c: 'ok' },
         { t: '', c: 'def' },
-        { t: '  ✓  Complete  ·  8m 34s', c: 'fin' },
-        { t: '     (vs ~6 hrs manual inspection)', c: 'nte' },
+        { h: counterRow('  Inspection accuracy: ', '91.3', '99.1', '%'), anim: 'counter' },
+        { t: '  ✓  Complete  ·  8m 34s  (vs ~6h manual)', c: 'fin' },
       ],
-      delays: [0,700,200,250,300,300,300,200,700,600,500,500,500,200,700,800,700,300,900,400]
+      delays: [0,700,200,250,300,300,300,200,700,600,550,550,550,200,800,800,700,300,900,600]
     },
     {
       lines: [
         { t: '> PhysMind Agent  ·  PhysicalFlow Runtime', c: 'th' },
         { t: '> 847 expert skills indexed  ·  ready', c: 'def' },
         { t: '', c: 'def' },
-        { t: '  CASE 2 / 2  ·  DESIGN FOR MAKING', c: 'case' },
-        { t: '  ── 6-DOF Robot Arm Calibration ─────────', c: 'sep' },
-        { t: '  Task   : Kinematic calibration  ·  Cell C3', c: 'def' },
+        { t: '  CASE 2 / 3  ·  DESIGN FOR MAKING', c: 'case' },
+        { t: '  ── 6-DOF Robot Arm Kinematic Calibration', c: 'sep' },
+        { t: '  Task   : Joint calibration  ·  Cell C3', c: 'def' },
         { t: '  System : Welding robot  ·  URDF v2.4', c: 'def' },
         { t: '', c: 'def' },
         { t: '  [Kinematics]  T = ∏ᵢ Rot(zᵢ,θᵢ)·Trans(dᵢ)', c: 'phys' },
-        { t: '  θ₁:  12.4° → 14.2°  ███████░  Δ+1.8°  ✓', c: 'bar' },
-        { t: '  θ₂: -23.1° → -21.8° ███████░  Δ+1.3°  ✓', c: 'bar' },
-        { t: '  θ₃:  45.0° → 45.6°  ████████  Δ+0.6°  ✓', c: 'bar' },
-        { t: '  θ₄:   0.0° →  0.0°  ████████  nominal ✓', c: 'bar' },
+        { h: barRow('  θ₁:  12.4°→14.2°  ', 72, 'joint', '  Δ+1.8°  ✓'), anim: 'bar' },
+        { h: barRow('  θ₂: -23.1°→-21.8° ', 68, 'joint', '  Δ+1.3°  ✓'), anim: 'bar' },
+        { h: barRow('  θ₃:  45.0°→45.6°  ', 84, 'joint', '  Δ+0.6°  ✓'), anim: 'bar' },
+        { h: barRow('  θ₄:   0.0°→ 0.0°  ', 80, 'joint', '  nominal ✓'), anim: 'bar' },
         { t: '', c: 'def' },
         { t: '  [1/4] Forward kinematics: solved', c: 'stp' },
         { t: '  [2/4] Collision check: CLEAR  ✓', c: 'ok' },
         { t: '  [3/4] Trajectory optimized  ✓', c: 'ok' },
         { t: '  [4/4] PLC upload: SUCCESS  ✓', c: 'ok' },
         { t: '', c: 'def' },
-        { t: '  ✓  Complete  ·  2m 47s', c: 'fin' },
-        { t: '     (vs ~4 hrs manual calibration)', c: 'nte' },
+        { h: counterRow('  Positioning accuracy: ', '94.7', '99.6', '%'), anim: 'counter' },
+        { t: '  ✓  Complete  ·  2m 47s  (vs ~4h manual)', c: 'fin' },
       ],
-      delays: [0,700,200,250,300,300,300,200,700,500,500,500,500,200,600,700,700,700,300,900,400]
+      delays: [0,700,200,250,300,300,300,200,700,550,550,550,550,200,700,700,700,700,300,900,600]
+    },
+    {
+      lines: [
+        { t: '> PhysMind Agent  ·  PhysicalFlow Runtime', c: 'th' },
+        { t: '> 847 expert skills indexed  ·  ready', c: 'def' },
+        { t: '', c: 'def' },
+        { t: '  CASE 3 / 3  ·  DESIGN FOR MAKING', c: 'case' },
+        { t: '  ── CNC Coolant Flow Optimization ────────', c: 'sep' },
+        { t: '  Task   : Cutting fluid parameter control', c: 'def' },
+        { t: '  System : 5-axis CNC  ·  Ti-6Al-4V workpiece', c: 'def' },
+        { t: '', c: 'def' },
+        { t: '  [Fluid Dynamics]  ∇·u = 0,  Re = ρuL/μ', c: 'phys' },
+        { h: barRow('  Flow rate:  8.2 L/m  ', 82, 'flow', '  ✓ optimal'), anim: 'bar' },
+        { h: barRow('  Pressure:   2.4 MPa  ', 60, 'flow', '  ✓ stable'), anim: 'bar' },
+        { h: barRow('  Re:  4,200           ', 70, 'joint', '  turbulent ✓'), anim: 'bar' },
+        { h: barRow('  Tool temp: 287°C     ', 57, 'ok',   '  ✓ within range'), anim: 'bar' },
+        { t: '', c: 'def' },
+        { t: '  [1/3] Flow regime classified: turbulent', c: 'stp' },
+        { t: '  [2/3] Nozzle angle optimized  ✓', c: 'ok' },
+        { t: '  [3/3] G-code updated & validated  ✓', c: 'ok' },
+        { t: '', c: 'def' },
+        { h: counterRow('  Surface finish Ra: ', '1.8', '0.4', ' μm  ✓'), anim: 'counter' },
+        { t: '  ✓  Complete  ·  4m 12s  (vs ~3h manual)', c: 'fin' },
+      ],
+      delays: [0,700,200,250,300,300,300,200,700,600,600,600,600,200,800,750,750,300,900,600]
     }
   ];
 
   const termBody = document.getElementById('terminal-body');
   let caseIdx = 0;
+
+  function animateBars(container) {
+    container.querySelectorAll('.t-bar-fill[data-w]').forEach(el => {
+      const w = el.getAttribute('data-w');
+      requestAnimationFrame(() => { el.style.width = w + '%'; });
+    });
+  }
+
+  function animateCounter(el) {
+    const from = parseFloat(el.getAttribute('data-from'));
+    const to   = parseFloat(el.getAttribute('data-to'));
+    const dec  = (String(from).split('.')[1] || '').length;
+    const dur  = 1400;
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const val = from + (to - from) * ease;
+      el.textContent = val.toFixed(dec);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
 
   function runTerminal() {
     const { lines, delays } = CASES[caseIdx % CASES.length];
@@ -1617,11 +1696,21 @@
     termBody.innerHTML = '';
     let idx = 0;
     function next() {
-      if (idx >= lines.length) { setTimeout(runTerminal, 3000); return; }
-      const { t, c } = lines[idx];
+      if (idx >= lines.length) { setTimeout(runTerminal, 3500); return; }
+      const line = lines[idx];
       const div = document.createElement('div');
-      div.className = 't-line ' + c;
-      div.textContent = t;
+      div.className = 't-line';
+      if (line.h !== undefined) {
+        div.innerHTML = '<span class="t-bar-row">' + line.h + '</span>';
+        if (line.anim === 'bar')     setTimeout(() => animateBars(div), 80);
+        if (line.anim === 'counter') setTimeout(() => {
+          const cv = div.querySelector('.t-count-val');
+          if (cv) animateCounter(cv);
+        }, 120);
+      } else {
+        div.className = 't-line ' + line.c;
+        div.textContent = line.t;
+      }
       if (idx === lines.length - 1) {
         const cur = document.createElement('span');
         cur.className = 't-cursor';
